@@ -1,0 +1,34 @@
+* {
+    font-family: system-ui;
+    font-size: var(--font-size); /* Note, font properties are different for different elements. Setting this will make it the same for all. */
+}
+
+input[type="number"] {
+    border: none;
+}
+
+html {
+    display: flex;
+    flex-direction: column;
+    background: var(--bg-color);
+    background-size: cover;
+    background-position: center;
+    width: 100%;
+    height: 100%;
+    color: white;
+    -webkit-user-select: none;
+    user-select: none;
+    padding: 120px; /* on purpose. Look how wires are shifted because of that. Fix that */
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+body {
+    overflow: hidden;
+    display: flex;
+    box-sizing: border-box;
+    width: 100%;
+    height: 100%;
+    gap: 12px;
+    margin: 0;
+}

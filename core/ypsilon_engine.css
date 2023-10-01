@@ -1,0 +1,10 @@
+.ye-container {
+    overflow-y: auto;
+    zoom: 0.8;
+}
+
+/* Cancel zoom effect for font
+
+.ye-container * {
+    font-size: calc(var(--font-size) * 1.1); 
+} */

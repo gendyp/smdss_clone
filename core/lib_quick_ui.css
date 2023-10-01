@@ -1,0 +1,260 @@
+:root {
+    --font-size: 12px;
+    --font-size-big: 15px;
+    --fg-color-0: hsl(218, 20%, 10%);
+    --fg-color-1: hsl(218, 20%, 20%);
+    --fg-color-contrast: hsl(0, 0%, 2%);
+    --bg-color: hsl(216, 20%, 5%);
+    --border: solid thin hsl(0 0% 25%);
+    --border-radius: 6px;
+    --text-color: white;
+    --text-color-dim: dimgray;
+}
+
+.qui-style-dimglow {
+    --font-size: 12px;
+    --font-size-big: 15px;
+    --fg-color-0: radial-gradient(hsl(216, 50%, 12%), hsl(216, 50%, 5%));
+    --fg-color-1: hsl(216, 40%, 20%);
+    --fg-color-contrast: hsl(216, 100%, 3%);
+    --bg-color: hsl(216, 20%, 5%);
+    --border: solid thin hsl(216 20% 25%);
+    --border-radius: 6px;
+    --text-color: white;
+    --text-color-dim: dimgray;
+}
+
+.qui-text-dim {
+    font-style: italic;
+    color: var(--text-color-dim);
+    pointer-events: none;
+}
+
+.qui-floating-block {
+    position: absolute !important;
+    z-index: 10;
+    box-shadow: 0 0 4px 0 black;
+}
+
+/* Use "qui-dropzone" on element to signify that an element is a valid drop target */
+
+.qui-valid-drop-target {
+    filter: invert(1);
+}
+
+.qui-side-panel {
+    width: min-content;
+    position: relative;
+    display: flex;
+    flex-shrink: 0;
+    flex-direction: column;
+    gap: 6px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.qui-struct-selector {
+    display: inline-block;
+}
+
+.qui-struct-label {
+    display: inline-block;
+    background-color: var(--fg-color-0);
+    padding: 4px;
+}
+
+.qui-generic-block-body-b {
+    overflow-y: auto;
+    border: var(--border);
+    border-radius: var(--border-radius);
+}
+
+.qui-generic-block-content-b {
+    margin: 8px;
+}
+
+.qui-generic-block-head-b {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+    background: var(--fg-color-1);
+    padding: 4px;
+    border-bottom: var(--border);
+    font-style: italic;
+}
+
+.qui-struct-content {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: baseline;
+}
+
+.qui-flex-column-flow div {
+    flex-direction: column;
+}
+
+.qui-flex-column-flow-important div {
+    flex-direction: column !important;
+}
+
+.qui-struct-array-element {
+    display: inline-block;
+}
+
+.qui-transformable {
+    position: absolute;
+    top: 0;
+    left: 0;
+    overflow: hidden;
+}
+
+.qui-labeled-container {
+    display: flex;
+    align-items: center;
+    /* justify-content: space-between; */
+    flex-direction: row !important;
+    gap: 4px;
+}
+
+.qui-fine-number-input {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-direction: row !important;
+    gap: 4px;
+}
+
+.qui-number-input {
+    display: flex;
+    align-items: center;
+    background: white;
+    color: black;
+    padding: 1px 4px;
+    box-sizing: border-box;
+}
+
+.qui-number-input:out-of-range, .qui-fine-number-input:host(input) {
+    background: red;
+    color: white;
+}
+
+.qui-generic-block-body {
+    position: relative;
+    min-width: min-content;
+    display: flex;
+    justify-content: center;
+    /* flex-shrink: 0; */
+    flex-direction: column;
+    box-sizing: border-box;
+    gap: 8px;
+    border: var(--border);
+    border-radius: var(--border-radius);
+    padding: 8px;
+    background: var(--fg-color-0);
+}
+
+.qui-contrast-block-body {
+    position: relative;
+    min-width: min-content;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    gap: 8px;
+    border: var(--border);
+    border-radius: var(--border-radius);
+    padding: 8px;
+    background: var(--fg-color-contrast);
+}
+
+.qui-generic-block-head {
+    text-align: center;
+}
+
+.qui-generic-group {
+    display: flex;
+    position: relative;
+    height: min-content;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 4px;
+}
+
+.qui-select-list {
+    gap: 0;
+    top: 100%;
+    max-height: 50vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+    white-space: nowrap;
+}
+
+.qui-select-list-element {
+    text-align: initial;
+    margin: 0;
+    padding: 0;
+    background: none;
+    border-style: none;
+    color: var(--text-color);
+}
+
+.qui-select-list-element:hover {
+    color: red;
+}
+
+.qui-dialog {
+    color: var(--text-color);
+    background: var(--fg-color-0);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    user-select: none;
+    border: var(--border);
+    border-radius: var(--border-radius);
+    white-space: break-spaces;
+    text-align: center;
+    
+}
+
+.qui-dialog::backdrop {
+    background: rgba(0, 0, 0, 0.8);
+}
+
+.qui-hint {
+    align-items: center;
+    max-width: min-content;
+    pointer-events: none;
+    white-space: break-spaces;
+}
+
+.qui-large {
+    font-size: var(--font-size-big);
+}
+
+.qui-large * {
+    font-size: var(--font-size-big);
+}
+
+.qui-messager-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    position: absolute;
+    bottom: 5%;
+    left: 3%;
+    z-index: 8;
+}
+
+.qui-messager-message {
+    animation: blink 0.20s;
+    animation-iteration-count: 5;
+    animation-timing-function: step-end;
+}
+
+@keyframes blink {
+    from { border-color: white; }
+    50% { border-color: black; }
+    to {}
+}

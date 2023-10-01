@@ -1,0 +1,11 @@
+.aazer-canvas-container {
+    aspect-ratio: 1.5;
+    position: relative;
+    border: var(--border);
+}
+
+.aazer-canvas-container > canvas {
+    position: absolute;
+    pointer-events: none;
+    inset: 0;
+}

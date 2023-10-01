@@ -1,0 +1,55 @@
+.view-focus-point {
+    position: relative;
+    z-index: 10;
+}
+
+.view-canvas {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+
+.view-body {
+    position: relative;
+    margin: 0;
+    width: 100%;
+    height: 100%;
+}
+
+/* */
+
+/* .view-block {
+    position: absolute;
+    top: 0;
+    left: 0;
+    transform: translate(-50%, -50%);
+    overflow: hidden;
+}
+
+.view-port-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.view-port-set {
+    background-color: rgba(255, 255, 255, 0.089);
+}
+
+.view-port-set.outputs {
+    background-color: red;
+}
+
+.view-port-set > * {
+    padding: 4px;
+}
+
+.view-port {
+    min-width: 128px;
+    padding: 4px;
+}
+
+.view-port:hover {
+    background-color: purple;
+} */
