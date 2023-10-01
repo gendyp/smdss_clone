@@ -1,2 +1,1 @@
-# smdss_clone
-SEGA Mega Drive sound system clone "Ypsilon"
+# SEGA Mega Drive sound system clone project
