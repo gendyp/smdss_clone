@@ -4,7 +4,7 @@ Use [this](https://gendyp.github.io/smdss_clone/core/index.html) link to check o
 # About the project
 Technically *work in progress*, though I don't really know where to go from its current state, very likely it'll stay like this.
 
-Idea was to make a program aimed to aid in learning of the Mega Drive sound system. It's *not* music maker or VGM player.
+Idea was to make a program aimed to aid in learning the *idea* behind Mega Drive sound system, how it produces such sound and how you can recreate it. It's not music maker, VGM player or hardware emulator.
 
 Made using vanilla Javascript so you can play around with the code easily. Code runs locally, no APIs which run in [secure context](https://developer.mozilla.org/en-US/docs/Web/Security/Secure_Contexts) were used. That results in relatively *poor performance*.
 
