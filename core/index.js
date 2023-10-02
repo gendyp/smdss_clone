@@ -216,7 +216,7 @@ function construct_utilities() {
     );
 
     const GROUP_0 = document.createElement("div");
-	GROUP_0.className = "qui-generic-group";
+    GROUP_0.className = "qui-generic-group";
 
     GROUP_0.append(LOG_STATE, LOG_DOWNLOAD);
 

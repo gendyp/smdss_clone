@@ -380,7 +380,7 @@ class EventSequencePlayer {
 
         const THIS = this;
         const CONTAINER = document.createElement("div");
-		CONTAINER.classList.add("qui-generic-block-body");
+        CONTAINER.classList.add("qui-generic-block-body");
 
         // 
 
@@ -438,7 +438,7 @@ class EventSequencePlayer {
         // 
 
         const GROUP_0 = document.createElement("div");
-		GROUP_0.classList.add("qui-generic-group");
+        GROUP_0.classList.add("qui-generic-group");
 
         GROUP_0.append(
             FIELD_TEMPO,
@@ -452,7 +452,7 @@ class EventSequencePlayer {
         // 
 
         const GROUP_1 = document.createElement("div");
-		GROUP_1.classList.add("qui-generic-group");
+        GROUP_1.classList.add("qui-generic-group");
 
         const SLIDER_POSITION = new LIB_QUICK_UI.customElements.Input(true);
         Object.assign(SLIDER_POSITION, {
@@ -478,11 +478,11 @@ class EventSequencePlayer {
         // 
 
         CONTAINER.append(
-			GROUP_0,
+            GROUP_0,
             GROUP_1,
-		);
+        );
 
-		LIB_QUICK_UI.appendHeader(CONTAINER, "Event Sequence Player");
+        LIB_QUICK_UI.appendHeader(CONTAINER, "Event Sequence Player");
 
         this.node_domUi = CONTAINER;
     }

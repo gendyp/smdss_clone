@@ -1,47 +1,47 @@
 .vpk-key-container {
-	display: flex;
-	flex-grow: 1;
-	position: relative;
-	width: 100%;
-	height: 60px;
-	overflow: visible;
-	touch-action: none;
+    display: flex;
+    flex-grow: 1;
+    position: relative;
+    width: 100%;
+    height: 60px;
+    overflow: visible;
+    touch-action: none;
 }
 
 .vpk-octave-group {
-	position: relative;
-	width: 100%;
-	height: 100%;
+    position: relative;
+    width: 100%;
+    height: 100%;
 }
 
 .vpk-key-group {
-	position: absolute;
-	display: flex;
-	flex-direction: row;
-	left: 0;
-	right: 0;
-	bottom: 0;
-	top: 0;
-	pointer-events: none;
+    position: absolute;
+    display: flex;
+    flex-direction: row;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    top: 0;
+    pointer-events: none;
 }
 
 .vpk-key-group.black {
-	bottom: 35%;
-	/* transform: translateX(-7.2%); Transform doesn't snap to pixels. */
-	left: -7.3%;
-	right: 7.3%;
+    bottom: 35%;
+    /* transform: translateX(-7.2%); Transform doesn't snap to pixels. */
+    left: -7.3%;
+    right: 7.3%;
 }
 
 .vpk-key {
-	display: flex;
-	justify-content: center;
-	position: relative;
-	flex-grow: 1;
-	border-style: solid;
-	border-color: black;
-	border-width: 0px 1px 1px 0px;
-	background-color: white;
-	pointer-events: auto;
+    display: flex;
+    justify-content: center;
+    position: relative;
+    flex-grow: 1;
+    border-style: solid;
+    border-color: black;
+    border-width: 0px 1px 1px 0px;
+    background-color: white;
+    pointer-events: auto;
 }
 
 /*
@@ -51,33 +51,33 @@ applied to the element.
 */
 
 @media (hover: hover) {
-	.vpk-key:hover {
-		background: steelblue !important;
-	}
+    .vpk-key:hover {
+        background: steelblue !important;
+    }
 }
 
 .vpk-key.black {
-	background: black;
-	border-left-width: 1px;
-	margin-left: 2%;
-	margin-right: 2%;
+    background: black;
+    border-left-width: 1px;
+    margin-left: 2%;
+    margin-right: 2%;
 }
 
 .vpk-key.spacer {
-	background-color: transparent !important;
-	border-color: transparent !important;
-	pointer-events: none;
+    background-color: transparent !important;
+    border-color: transparent !important;
+    pointer-events: none;
 }
 
 .vpk-key.pressed {
-	background: darkorange !important;
+    background: darkorange !important;
 }
 
 .vpk-name-label {
-	background: black;
-	padding: 4px;
+    background: black;
+    padding: 4px;
     z-index: 1;
-	position: absolute;
-	text-transform: uppercase;
-	text-wrap: nowrap;
+    position: absolute;
+    text-transform: uppercase;
+    text-wrap: nowrap;
 }
