@@ -78,7 +78,7 @@ class Ypsilon_Engine {
 
         // 
 
-        this.node_domUi = LIB_QUICK_UI.wrapInContainer_0(GROUP_0, "MIDI Engine", "Events get collected or replaced while moving through chain of modules. Any module is able to handle the events, affecting targets outside of engine");
+        this.node_domUi = LIB_QUICK_UI.wrapInContainer_0(GROUP_0, "MIDI Engine", "Events get collected or replaced while moving through chain of modules. Any module is able to handle the events, affecting targets outside of engine.\nNOTE: use channels from 10 to 13 to play on Latch generator");
         this.node_domUi.classList.add("qui-flex-column-flow");
     }
 }
