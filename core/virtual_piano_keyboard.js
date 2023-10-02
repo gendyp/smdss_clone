@@ -290,9 +290,14 @@ class VirtualPianoKeyboard extends HTMLElement {
 			if (!element.classList.contains("pressed")) element.classList.add("pressed");
 
 			const NOTE_NUMBER = keyNumber + this.noteNumberAddend;
-			const LABEL = dogo(
-				LIB_MIDI.convert_noteNumber_to_noteName(NOTE_NUMBER)
-			);
+			const LABEL = (function () {
+				const LABEL = document.createElement("div");
+
+				LABEL.className = "vpk-name-label";
+				LABEL.textContent = LIB_MIDI.convert_noteNumber_to_noteName(NOTE_NUMBER);
+			
+				return LABEL;
+			})();
 
 			element.append(LABEL);
 
@@ -635,12 +640,3 @@ Object.seal(VirtualPianoKeyboard.constructor);
 Object.freeze(VirtualPianoKeyboard.prototype);
 
 customElements.define("virtual-piano-keyboard", VirtualPianoKeyboard);
-
-function dogo(text = "A4") {
-	const LABEL = document.createElement("div");
-
-	LABEL.className = "vpk-name-label";
-	LABEL.textContent = text;
-
-	return LABEL;
-}
