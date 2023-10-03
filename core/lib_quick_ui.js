@@ -444,9 +444,9 @@ const LIB_QUICK_UI = {
 
         return LISTENER;
     },
-    create_optionList(listGetter = () => {}) {
+    create_optionList(listPointer = {}) {
         // When an option selected, it sends a signal with its name.
-        // That's all it does.
+        // It's only notifying a code outside of chosen option.
 
         const EMPTY_HOLDER = document.createElement("span");
         EMPTY_HOLDER.textContent = "List is empty";
@@ -462,7 +462,7 @@ const LIB_QUICK_UI = {
         Object.defineProperties(LISTCONTENT, {
             "options": {
                 get() {
-                    return listGetter();
+                    return listPointer.value;
                 }
             }
         });
@@ -473,7 +473,7 @@ const LIB_QUICK_UI = {
             // If you want, you can swap default list for some other.
             // Made possible to provide filtered list for example.
 
-            if (options == null) options = listGetter();
+            if (options == null) options = listPointer.value;
 
             LISTCONTENT.replaceChildren();
 
@@ -512,19 +512,21 @@ const LIB_QUICK_UI = {
 
         return LISTCONTENT;
     },
-    create_optionList_immediate(mapGetter = () => {}) {
+    create_optionList_executer(mapPointer = {}) {
         // Makes a list and attaches a method to an option, so as soon
-        // as option is selected, method is executed.
+        // as option is selected, specified method is executed.
 
         const OPTION_LIST = LIB_QUICK_UI.create_optionList(
-            () => Object.keys( mapGetter() )
+            new PointerShell(
+                Object.keys( mapPointer.value )
+            )
         );
 
         OPTION_LIST.addEventListener("optionlistselect", function (event) {
             OPTION_LIST.remove();
 
             try {
-                mapGetter()[event.detail]();
+                mapPointer.value[event.detail]();
             } catch {
                 shellMessage("😳 Could not execute a method provided for the option");
             }
@@ -533,7 +535,7 @@ const LIB_QUICK_UI = {
 
         return OPTION_LIST;
     },
-    create_dropDownSelector(listGetter = () => {}) {
+    create_dropDownSelector(listPointer = {}) {
         function checkSelection() {
             const KEY = FIELD.value;
 
@@ -594,7 +596,7 @@ const LIB_QUICK_UI = {
 
         // 
 
-        const LISTCONTENT = LIB_QUICK_UI.create_optionList(listGetter);
+        const LISTCONTENT = LIB_QUICK_UI.create_optionList(listPointer);
 
         LISTCONTENT.addEventListener("optionlistselect", function (event) {
             FIELD.value = event.detail;
@@ -653,7 +655,9 @@ const LIB_QUICK_UI = {
         CONTAINER.className = "qui-generic-group";
 
         const ENTRY = this.create_dropDownSelector(
-            () => Object.keys( mapGetter() )
+            new PointerShell(
+                Object.keys( mapGetter() )
+            )
         );
     
         // 
