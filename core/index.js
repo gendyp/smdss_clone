@@ -24,6 +24,7 @@ var analyzer = null;
 var pianoKeyboard = null;
 var player = null;
 var storageLoader = null;
+var magnifier = null;
 var waBlueprint = null;
 
 var node_domUi_utilities = null;
@@ -133,6 +134,72 @@ function constructor() {
             LEFT_PANEL,
             generator.node_domUi
         );
+
+        // 
+
+        magnifier = new class {
+            #body = document.body;
+
+            #bodyContainer = document.createElement("div");
+            #magnifierContainer = document.createElement("div");
+
+            #placeholderNode = document.createElement("div");
+            #capturedNode = null;
+        
+            constructor() {
+                // Magnifier makes selected generic block a main element in
+                // the document, by "replacing" the body with it. That also may improve
+                // performance, because all the tree doesn't need to be drawn/updated.
+
+                this.#bodyContainer.classList.add("magnifier-body");
+
+                this.#bodyContainer.append(
+                    ...this.#body.childNodes
+                );
+
+                this.#body.append(this.#bodyContainer);
+
+                // 
+
+                this.#magnifierContainer.classList.add("magnifier");
+
+                // 
+        
+                this.target = null;
+        
+                this.magnify = function () {
+                    if (!this.isInUse) {
+                        if (this.target == null) {
+                            shellMessage("Invalid target");
+                            return;
+                        }
+
+                        // Capture node and swap for placholder.
+
+                        this.#capturedNode = this.target;
+
+                        if (this.#capturedNode.parentNode != null) this.#capturedNode.replaceWith(this.#placeholderNode);
+
+                        // 
+
+                        this.#magnifierContainer.append(this.#capturedNode);
+                        this.#bodyContainer.replaceWith(this.#magnifierContainer);
+                    } else {
+                        if (this.#placeholderNode.parentNode != null) this.#placeholderNode.replaceWith(this.#capturedNode);
+                        else this.#capturedNode.remove();
+
+                        // 
+
+                        this.#magnifierContainer.replaceWith(this.#bodyContainer);
+                        this.#capturedNode = null;
+                    }
+                }
+            }
+        
+            get isInUse() {
+                return this.#capturedNode != null;
+            }
+        };
 
         // Blueprint stuff.
 
@@ -396,61 +463,8 @@ function extendPlayer(playerDomNode) {
 }
 
 function construct_contextMenu() {
-    const MAGNIFIER = new class {
-        #placeholderNode = document.createElement("div");
-        #capturedNode = null;
-
-        constructor() {
-            // Magnifier makes selected generic block a main element in
-            // the document, by "replacing" the body with it. That also may improve
-            // performance, because all the tree doesn't need to be drawn/updated.
-
-            this.target = null;
-
-            this.magnify = function () {
-                if (!this.isInUse) {
-                    // Hide body, replace target with a placeholder and attach
-                    // target to document element.
-
-                    if (this.target == null) {
-                        shellMessage("Invalid target");
-                        return;
-                    }
-
-                    // 
-
-                    this.#capturedNode = this.target;
-
-                    // 
-
-                    document.body.style.display = "none";
-
-                    if (this.#capturedNode.parentNode != null) this.#capturedNode.replaceWith(this.#placeholderNode);
-
-                    this.#capturedNode.style = "height: 100%";
-                    document.documentElement.append(this.#capturedNode);
-                } else {
-                    document.body.style.display = "";
-
-                    this.#capturedNode.style = "";
-
-                    if (this.#placeholderNode.parentNode != null) this.#placeholderNode.replaceWith(this.#capturedNode);
-                    else this.#capturedNode.remove();
-
-                    // 
-
-                    this.#capturedNode = null;
-                }
-            }
-        }
-
-        get isInUse() {
-            return this.#capturedNode != null;
-        }
-    }
-
     addEventListener("contextmenu", function (event) {
-        if (MAGNIFIER.isInUse) return;
+        if (magnifier.isInUse) return;
 
         // 
 
@@ -465,13 +479,13 @@ function construct_contextMenu() {
             node = BRANCH[i];
     
             if ( node.classList.contains("qui-generic-block-body") ) {
-                MAGNIFIER.target = node;
+                magnifier.target = node;
     
                 return;
             }
         }
 
-        MAGNIFIER.target = null;
+        magnifier.target = null;
     });
 
     // 
@@ -489,14 +503,14 @@ function construct_contextMenu() {
     const OPTION_LIST = LIB_QUICK_UI.create_optionList_executer(
         new PointerShell(
             {
-                "🔎 Magnify block/Cancel": () => MAGNIFIER.magnify(),
+                "🔎 Magnify block/Cancel": () => magnifier.magnify(),
                 // "👁️ Hide block": broken,
                 // "👁️ Unhide hidden blocks": () => {},
                 "Toggle UI lookups 💥60%": toggleUiUpdateState,
                 "Toggle analyzer updates 💥20%": () => shouldDisableAnalyzer = !shouldDisableAnalyzer,
                 "🧭 Magnify Web Audio Blueprint/Cancel": function () {
-                    MAGNIFIER.target = waBlueprint.viewport;
-                    MAGNIFIER.magnify();
+                    magnifier.target = waBlueprint.viewport;
+                    magnifier.magnify();
                 }
             }
         )

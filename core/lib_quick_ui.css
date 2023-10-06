@@ -14,11 +14,11 @@
 .qui-style-dimglow {
     --font-size: 12px;
     --font-size-big: 15px;
-    --fg-color-0: radial-gradient(hsl(216, 50%, 12%), hsl(216, 50%, 5%));
-    --fg-color-1: hsl(216, 40%, 20%);
+    --fg-color-0: radial-gradient(hsl(216, 50%, 6%), hsl(216, 50%, 3%));
+    --fg-color-1: hsl(216, 30%, 10%);
     --fg-color-contrast: hsl(216, 100%, 3%);
-    --bg-color: hsl(216, 20%, 5%);
-    --border: solid thin hsl(216 20% 25%);
+    --bg-color: hsl(216, 20%, 3%);
+    --border: solid thin hsl(216 10% 25%);
     --border-radius: 6px;
     --text-color: white;
     --text-color-dim: dimgray;

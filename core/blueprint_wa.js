@@ -473,14 +473,12 @@ class WaBlueprint {
                 THIS.viewport.addEventListener(
                     "pointermove",
                     (function (event) {
-                        // #WARNING
-                        // Coordinates in this app defined poorly. Right now,
-                        // I can't just "tell it" place this block at position of the mouse,
-                        // because it's all shifted and position not actually corresponds
-                        // to what you see on screen... fix that.
+                        // Position is calculated relative to viewport element.
 
-                        this.x = event.pageX - THIS.viewport.matrix.e;
-                        this.y = event.pageY - THIS.viewport.matrix.f;
+                        const RECTANGLE = THIS.viewport.getBoundingClientRect();
+
+                        this.x = event.pageX - RECTANGLE.left - THIS.viewport.matrix.e;
+                        this.y = event.pageY - RECTANGLE.top - THIS.viewport.matrix.f;
                     }).bind(this)
                 );
         
@@ -722,13 +720,13 @@ class WaBlueprint {
         }
     
         get position() {
-            const RECT = this.nodeDom.getBoundingClientRect();
+            const RECTANGLE = this.nodeDom.getBoundingClientRect();
 
             const X = this.nodeDom.matrix.e;
             const Y = this.nodeDom.matrix.f;
     
-            if (this.#isInput) return [X, Y + RECT.height * 0.5];
-            else return [X + RECT.width, Y + RECT.height * 0.5];
+            if (this.#isInput) return [X, Y + RECTANGLE.height * 0.5];
+            else return [X + RECTANGLE.width, Y + RECTANGLE.height * 0.5];
         }
     }
 

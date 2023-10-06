@@ -193,26 +193,27 @@ const LIB_QUICK_UI = {
         return CONTAINER;
     },
     keepCloserToCenter(x = 0, y = 0, node_dom) {
-        // #TODO
-        // Make it move only when block crosses the bounds.
-
         var tX = 0;
         var tY = 0;
         const RECTANGLE = document.documentElement.getBoundingClientRect();
+        const NODE_RECTANGLE = node_dom.getBoundingClientRect();
 
-        // If in the right or lower area of the screen.
-        // Change position of the block so it stays closer to center and
-        // visible in any corner of the screen.
-
-        if (x >= RECTANGLE.width * 0.5) tX = "-100%";
-        if (y >= RECTANGLE.height * 0.5) tY = "-100%";
+        //
         
-        if (x + y != 0) node_dom.style.transform = "translate(" + tX + ", " + tY + ")";
-        else node_dom.style.transform = "";
+        node_dom.style.transform = "";
 
-        // Are coordinates in the lower area of the screen?
+        tX = RECTANGLE.width - (x + NODE_RECTANGLE.width);
+        tY = RECTANGLE.height - (y + NODE_RECTANGLE.height);
 
-        return tY != 0;
+        if (tX < 0) tX = Math.round(tX / NODE_RECTANGLE.width * 100);
+        else tX = 0;
+
+        if (tY < 0) tY = Math.round(tY / NODE_RECTANGLE.height * 100);
+        else tY = 0;
+
+        // 
+
+        if (tX < 0 || tY < 0) node_dom.style.transform = "translate(" + tX + "%, " + tY + "%)";
     },
     create_labeledContainer(element, text = "") {
         const CONTAINER = document.createElement("div");

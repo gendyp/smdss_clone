@@ -18,7 +18,6 @@ html {
     color: white;
     -webkit-user-select: none;
     user-select: none;
-    padding: 120px; /* on purpose. Look how wires are shifted because of that. Fix that */
     box-sizing: border-box;
     overflow: hidden;
 }
@@ -31,4 +30,18 @@ body {
     height: 100%;
     gap: 12px;
     margin: 0;
+}
+
+.magnifier-body {
+    all: inherit;
+    padding: 12px;
+}
+
+.magnifier {
+    all: inherit;
+}
+
+.magnifier > * {
+    width: 100%;
+    border: none;
 }
