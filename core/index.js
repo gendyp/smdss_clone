@@ -500,9 +500,9 @@ function construct_contextMenu() {
         }
     }
 
-    const OPTION_LIST = LIB_QUICK_UI.create_optionList_executer(
-        new PointerShell(
-            {
+    const OPTION_LIST = LIB_QUICK_UI.create_optionList_immediate(
+        function () {
+            return {
                 "🔎 Magnify block/Cancel": () => magnifier.magnify(),
                 // "👁️ Hide block": broken,
                 // "👁️ Unhide hidden blocks": () => {},
@@ -513,7 +513,7 @@ function construct_contextMenu() {
                     magnifier.magnify();
                 }
             }
-        )
+        }
     );
 
     LIB_QUICK_UI.make_floatingBlock(

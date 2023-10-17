@@ -356,9 +356,11 @@ class WaBlueprint {
 
                 // Context menu stuff.
 
-                var propList = new PointerShell( [] );
+                var propList = [];
 
-                const OPTION_LIST = LIB_QUICK_UI.create_optionList(propList);
+                const OPTION_LIST = LIB_QUICK_UI.create_optionList(
+                    () => propList
+                );
             
                 const CALL_FLOATY = LIB_QUICK_UI.make_floatingBlock(
                     {
@@ -391,7 +393,7 @@ class WaBlueprint {
                     // Expose modifiable properties in context menu. Menu should have
                     // list of names of properties and input field to set a value.
 
-                    propList.value = Object.keys(
+                    propList = Object.keys(
                         this.entryRegistry[domNode._key].node.constructor.prototype
                     );
 

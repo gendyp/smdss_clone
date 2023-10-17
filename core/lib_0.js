@@ -300,16 +300,9 @@ const LIB_0 = {
 }
 
 class Pointer {
-    #object;
-    #key;
-
     constructor(object, key) {
-        if ( !(key in object) ) throw "Key is not defined on the object";
-
         this.#object = object;
         this.#key = key;
-
-        Object.freeze(this);
     }
 
     get value() {
@@ -318,16 +311,5 @@ class Pointer {
 
     set value(value) {
         this.#object[this.#key] = value;
-    }
-}
-
-class PointerShell {
-    constructor(value) {
-        Object.defineProperties(this, {
-            "value": {
-                value: value,
-                writable: true
-            }
-        });
     }
 }
