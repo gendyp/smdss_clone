@@ -236,6 +236,11 @@ function constructor() {
         };
 
         waBlueprint.loadProject();
+
+
+
+
+
     }
 }
 
@@ -464,11 +469,27 @@ function extendPlayer(playerDomNode) {
 
 function construct_contextMenu() {
     addEventListener("contextmenu", function (event) {
-        if (magnifier.isInUse) return;
+        const BRANCH = document.elementsFromPoint(event.pageX, event.pageY);
+
+        LIB_0.object.clear(THE_MAP);
+
+        Object.assign(
+            THE_MAP,
+            Object.fromEntries( Object.entries(BRANCH) )
+        );
+
+        OPTION_LIST.fill();
+
+        // console.log(THE_MAP);
+
+
+
+
+        /* if (magnifier.isInUse) return;
 
         // 
 
-        const BRANCH = document.elementsFromPoint(event.pageX, event.pageY);
+        
         const LENGTH = BRANCH.length;
     
         // 
@@ -485,7 +506,7 @@ function construct_contextMenu() {
             }
         }
 
-        magnifier.target = null;
+        magnifier.target = null; */
     });
 
     // 
@@ -500,28 +521,35 @@ function construct_contextMenu() {
         }
     }
 
-    const OPTION_LIST = LIB_QUICK_UI.create_optionList_immediate(
-        function () {
-            return {
-                "🔎 Magnify block/Cancel": () => magnifier.magnify(),
-                // "👁️ Hide block": broken,
-                // "👁️ Unhide hidden blocks": () => {},
-                "Toggle UI lookups 💥60%": toggleUiUpdateState,
-                "Toggle analyzer updates 💥20%": () => shouldDisableAnalyzer = !shouldDisableAnalyzer,
-                "🧭 Magnify Web Audio Blueprint/Cancel": function () {
-                    magnifier.target = waBlueprint.viewport;
-                    magnifier.magnify();
-                }
-            }
+    const THE_MAP = {};
+
+    /* {
+        "🔎 Magnify block/Cancel": () => magnifier.magnify(),
+        // "👁️ Hide block": broken,
+        // "👁️ Unhide hidden blocks": () => {},
+        "Toggle UI lookups 💥60%": toggleUiUpdateState,
+        "Toggle analyzer updates 💥20%": () => shouldDisableAnalyzer = !shouldDisableAnalyzer,
+        "🧭 Magnify Web Audio Blueprint/Cancel": function () {
+            magnifier.target = waBlueprint.viewport;
+            magnifier.magnify();
         }
-    );
+    } */
+
+    const OPTION_LIST = piepie( () => Object.keys(THE_MAP) );
+    // LIB_QUICK_UI.create_optionList_executer( () => THE_MAP );
 
     LIB_QUICK_UI.make_floatingBlock(
         {
             blockContent: OPTION_LIST,
-            openName: "contextmenu"
+            openName: "contextmenu",
+            shouldCenter: true
         }
     );
+
+    OPTION_LIST.addEventListener("optionlistselect", function (event) {
+        console.log(event.detail);
+        this.remove();
+    });
 }
 
 function makeWavFile(samples = [], fileName = "") {

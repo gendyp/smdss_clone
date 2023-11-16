@@ -192,28 +192,28 @@ const LIB_QUICK_UI = {
 
         return CONTAINER;
     },
-    keepCloserToCenter(x = 0, y = 0, node_dom) {
+    keepCloserToCenter(x = 0, y = 0, domNode) {
         var tX = 0;
         var tY = 0;
         const RECTANGLE = document.documentElement.getBoundingClientRect();
-        const NODE_RECTANGLE = node_dom.getBoundingClientRect();
+        const NODE_RECTANGLE = domNode.getBoundingClientRect();
 
         //
-        
-        node_dom.style.transform = "";
 
         tX = RECTANGLE.width - (x + NODE_RECTANGLE.width);
         tY = RECTANGLE.height - (y + NODE_RECTANGLE.height);
+        
+        if (tX < 0) x += tX;
+        else if (x < 0) x = 0;
 
-        if (tX < 0) tX = Math.round(tX / NODE_RECTANGLE.width * 100);
-        else tX = 0;
+        if (tY < 0) y += tY;
+        else if (y < 0) y = 0;
 
-        if (tY < 0) tY = Math.round(tY / NODE_RECTANGLE.height * 100);
-        else tY = 0;
+        // If no change was made it will still reassign these
+        // values, but let's just leave it like that for now.
 
-        // 
-
-        if (tX < 0 || tY < 0) node_dom.style.transform = "translate(" + tX + "%, " + tY + "%)";
+        domNode.style.left = x + "px";
+        domNode.style.top = y + "px";
     },
     create_labeledContainer(element, text = "") {
         const CONTAINER = document.createElement("div");
@@ -366,7 +366,8 @@ const LIB_QUICK_UI = {
             blockContent,
             eventTarget = window,
             openName = "",
-            partsOfSafeArea = []
+            partsOfSafeArea = [],
+            shouldCenter = false
         }
     ) {
         // Floating block appears on top of most UI elements, it is
@@ -376,14 +377,14 @@ const LIB_QUICK_UI = {
         // otherwise it'll be placed in the center.
 
         blockContent.classList.add("qui-floating-block");
-        /*
-        const REORDER = function () {
+        
+        /* const REORDER = function () {
             // For accessibility, I guess, reorder list elements and scroll to the bottom.
 
             blockContent.replaceChildren( ...Array.prototype.toReversed.call(blockContent.children) );
             blockContent.scrollTo(0, blockContent.scrollHeight);
-        }
-        */
+        } */
+        
         // 
 
         const SAFE_AREA_PARTS = [blockContent, ...partsOfSafeArea];
@@ -409,30 +410,51 @@ const LIB_QUICK_UI = {
             // but you need it, you can provide it by adding properties named
             // accordingly to a node. Those properties will be removed after
             // they are used.
+
+            // First we decide where to physically place our content.
+
+            var x, y;
+            var _shouldCenter = shouldCenter;
             
             if ("placeMeX" in blockContent) {
-                blockContent.style.left = blockContent.placeMeX + "px";
-                blockContent.style.top = blockContent.placeMeY + "px";
-
-                LIB_QUICK_UI.keepCloserToCenter(blockContent.placeMeX, blockContent.placeMeY, blockContent);
+                x = blockContent.placeMeX;
+                y = blockContent.placeMeY;
 
                 delete blockContent.placeMeX;
                 delete blockContent.placeMeY;
             }
             else if ( (event instanceof PointerEvent) && (event.button != -1) ) {
-                blockContent.style.left = event.pageX + "px";
-                blockContent.style.top = event.pageY + "px";
-
-                LIB_QUICK_UI.keepCloserToCenter(event.pageX, event.pageY, blockContent);
+                x = event.pageX;
+                y = event.pageY;
             }
             else {
+                // No position data was found. Place content in center.
+
                 const RECTANGLE = document.documentElement.getBoundingClientRect();
 
-                blockContent.style.left = RECTANGLE.width * 0.5 + "px";
-                blockContent.style.top = RECTANGLE.height * 0.5 + "px";
+                x = RECTANGLE.width * 0.5;
+                y = RECTANGLE.height * 0.5;
 
-                blockContent.style.transform = "translate(-50%, -50%)";
+                _shouldCenter = true;
             }
+
+            if (_shouldCenter) {
+                const RECTANGLE = blockContent.getBoundingClientRect();
+
+                x -= RECTANGLE.width * 0.5;
+                y -= RECTANGLE.height * 0.5;
+            }
+                
+            blockContent.style.left = x + "px";
+            blockContent.style.top = y + "px";
+
+            // 
+
+            LIB_QUICK_UI.keepCloserToCenter(
+                x,
+                y,
+                blockContent
+            );
 
             // 
 
@@ -445,7 +467,7 @@ const LIB_QUICK_UI = {
 
         return LISTENER;
     },
-    create_optionList(listGetter = () => {}) {
+    create_optionList(listGetter = () => []) {
         // When an option selected, it sends a signal with its name.
         // That's all it does.
 
@@ -468,7 +490,9 @@ const LIB_QUICK_UI = {
             }
         });
 
-        // 
+        // #NOTE
+        // You need to refresh the list manually, it does not refresh
+        // each time it is accessed/shown.
 
         LISTCONTENT.fill = function (options) {
             // If you want, you can swap default list for some other.
@@ -513,7 +537,7 @@ const LIB_QUICK_UI = {
 
         return LISTCONTENT;
     },
-    create_optionList_immediate(mapGetter = () => {}) {
+    create_optionList_executer(mapGetter = () => {}) {
         // Makes a list and attaches a method to an option, so as soon
         // as option is selected, method is executed.
 
@@ -534,7 +558,7 @@ const LIB_QUICK_UI = {
 
         return OPTION_LIST;
     },
-    create_dropDownSelector(listGetter = () => {}) {
+    create_dropDownSelector(listGetter = () => []) {
         function checkSelection() {
             const KEY = FIELD.value;
 
@@ -601,7 +625,7 @@ const LIB_QUICK_UI = {
             FIELD.value = event.detail;
             checkSelection();
             this.remove();
-        })
+        });
 
         // 
 
@@ -1377,7 +1401,6 @@ Object.defineProperties(LIB_QUICK_UI, {
 
 customElements.define("custom-input", LIB_QUICK_UI.customElements.Input, { extends: "input" });
 
-
 // If you want to call a function with a timeout and be able to reset the timer
 // easily, this is what it's for.
 // Timeout is launched as soon as object created.
@@ -1426,3 +1449,212 @@ class TimeoutMethod {
 }
 
 var shellMessage = LIB_QUICK_UI.MESSAGER.pushMessage.bind(LIB_QUICK_UI.MESSAGER);
+
+// I place it temporarily here.
+
+const LIB_SVG = {
+    createElement: function(string = "svg") {
+        return document.createElementNS("http://www.w3.org/2000/svg", string);
+    },
+    setAttributes: function(svg, attributes) {
+        Object.keys(attributes).forEach(function(key) {
+            svg.setAttributeNS(null, key, attributes[key]);
+        });
+        
+        return svg;
+    },
+    Pie: class {
+        #domNode = null;
+        #group = null;
+        #centerPadding = 64;
+        #sliceDefinition = "";
+
+        constructor(width = 512) {
+            this.width = width;
+
+            this.makeSvg();
+        }
+
+        get domNode() {
+            return this.#domNode;
+        }
+
+        updateSliceDefinition(angle = 45) {
+            const TRANSFORM = new DOMMatrix;
+
+            // Initial transform points at X. We make it
+            // point at -Y.
+
+            TRANSFORM.rotateSelf(-90 - (angle * 0.5));
+
+            const PAD_SCALAR = this.#centerPadding / this.width;
+            
+            const A_CLOSE = TRANSFORM.a * PAD_SCALAR + " " + TRANSFORM.b * PAD_SCALAR;
+            const A_FAR = TRANSFORM.a + " " + TRANSFORM.b;
+
+            TRANSFORM.rotateSelf(angle);
+
+            const B_CLOSE = TRANSFORM.a * PAD_SCALAR + " " + TRANSFORM.b * PAD_SCALAR;
+            const B_FAR = TRANSFORM.a + " " + TRANSFORM.b;
+
+            // Define path.
+
+            this.#sliceDefinition = "M " + A_CLOSE +
+            " L " + A_FAR +
+            " A 1 1 0 0 1 " + B_FAR +
+            " L " + B_CLOSE +
+            " A " + PAD_SCALAR + " " + PAD_SCALAR + " 0 0 0 " + A_CLOSE;
+        }
+
+        makeSvg() {
+            this.#domNode = LIB_SVG.createElement();
+            this.#domNode.style.width = this.width + "px";
+
+            // Working in clip space.
+            // Note that Y axis is inverted here (points down).
+
+            LIB_SVG.setAttributes(
+                this.#domNode,
+                {
+                    "id": "pie-menu",
+                    "viewBox": "-1 -1 2 2"
+                }
+            );
+
+            // 
+
+            const DEFINITIONS = LIB_SVG.createElement("defs");
+
+            this.#domNode.append(DEFINITIONS);
+
+            // A container for slices.
+
+            this.#group = LIB_SVG.createElement("g");
+            this.#domNode.append(this.#group);
+        }
+
+        fill(listAngles) {
+            this.#group.replaceChildren();
+
+            if ( !Array.isArray(listAngles) ) return;
+            if (listAngles.length == 0) return;
+
+            // Create slices using saved path.
+
+            const THIS = this;
+
+            this.updateSliceDefinition(360 / listAngles.length);
+
+            var slice;
+
+            listAngles.forEach(function(angle) {
+                slice = LIB_SVG.createElement("path");
+                
+                LIB_SVG.setAttributes(
+                    slice,
+                    {
+                        "d": THIS.#sliceDefinition,
+                        "transform": "rotate(" + angle + ")"
+                    }
+                );
+
+                THIS.#group.append(slice);
+            });
+
+            return this.#domNode;
+        }
+    }
+}
+
+// Positions elements provided to it in pie layout or something.
+
+function piepie(listGetter = () => []) {
+    // #NOTE
+    // Atan2 to find an angle between initial direction
+    // and other direction vector.
+
+    const CONTAINER = document.createElement("div");
+    CONTAINER.classList.add("qui-pie-container");
+
+    const LABEL_CONTAINER = document.createElement("div");
+    LABEL_CONTAINER.classList.add("qui-pie-label-container");
+
+    const SVG_PIE = new LIB_SVG.Pie;
+    SVG_PIE.domNode.classList.add("qui-pie-svg");
+
+    CONTAINER.append(SVG_PIE.domNode);
+    CONTAINER.append(LABEL_CONTAINER);
+
+    var _options;
+
+    // 
+
+    CONTAINER.fill = function (options) {
+        _options = (options == null) ? listGetter() : options;
+
+        // Get angles for SVG slices and locations for elements,
+        // which going to represent an option.
+
+        const MAGNITUDE = 160;
+        const NUMBER_OF_SLICES = _options.length;
+        const SLICE_ANGLE = 360 / NUMBER_OF_SLICES;
+        const TRANSFORM = new DOMMatrix;
+
+        const LIST_LOCATION = [];
+        const LIST_ANGLE = [];
+
+        var angle = 0;
+        var domNode = null;
+
+        // 
+
+        LABEL_CONTAINER.replaceChildren();
+
+        for (let i = 0; i < NUMBER_OF_SLICES; i++) {
+            LIST_LOCATION.push(
+                {
+                    x: TRANSFORM.a * MAGNITUDE,
+                    y: TRANSFORM.b * MAGNITUDE
+                }
+            );
+
+            // Create elements here for now.
+
+            domNode = document.createElement("div");
+            domNode.classList.add("qui-contrast-block-body");
+            domNode.innerText = String( _options[i] );
+
+            domNode.style.top = TRANSFORM.a * -MAGNITUDE + "px";
+            domNode.style.left = TRANSFORM.b * MAGNITUDE + "px";
+
+            LABEL_CONTAINER.append(domNode);
+
+            // 
+
+            TRANSFORM.rotateSelf(SLICE_ANGLE);
+
+            // 
+
+            LIST_ANGLE.push(angle);
+
+            angle += SLICE_ANGLE;
+        }
+
+        SVG_PIE.fill(LIST_ANGLE);
+    }
+
+    SVG_PIE.domNode.addEventListener("pointerdown", function (event) {
+        if (event.target == this) return;
+
+        // 
+
+        var index = Array.prototype.indexOf.call(event.target.parentElement.children, event.target);
+
+        CONTAINER.dispatchEvent(new CustomEvent("optionlistselect", {
+            bubbles: true,
+            detail: _options[index]
+        }));
+    });
+
+    return CONTAINER;
+}

@@ -9,6 +9,7 @@
     --border-radius: 6px;
     --text-color: white;
     --text-color-dim: dimgray;
+    --bright-accent: white;
 }
 
 .qui-style-dimglow {
@@ -22,6 +23,7 @@
     --border-radius: 6px;
     --text-color: white;
     --text-color-dim: dimgray;
+    --bright-accent: hsl(269.13deg 100% 50%);
 }
 
 .qui-text-dim {
@@ -228,6 +230,8 @@
     white-space: break-spaces;
 }
 
+/* #NOTE What it is used for? Only text? */
+
 .qui-large {
     font-size: var(--font-size-big);
 }
@@ -257,4 +261,39 @@
     from { border-color: white; }
     50% { border-color: black; }
     to {}
+}
+
+/* SVG pie style */
+
+.qui-pie-svg {
+    background-image: radial-gradient(white 6%, #46e5ff 10%, #0089ff 18%, transparent 70%);
+}
+
+.qui-pie-svg path {
+    fill: transparent
+}
+
+.qui-pie-svg path:hover {
+    fill: rgba(255, 255, 255, 0.5);
+}
+
+.qui-pie-label-container {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+}
+
+.qui-pie-label-container > div {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    font-size: var(--font-size-big);
+}
+
+.qui-pie-container {
+    position: relative;
+    box-shadow: none !important;
+}
+
+.qui-pie-container > div {
+    pointer-events: none;
 }
