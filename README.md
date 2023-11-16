@@ -3,6 +3,7 @@
 # Live version
 > [!WARNING]
 > Live version may not work at all or be in unstable/partly functional state. Apologies for inconvenience to those who tried to check it out. I'm currently experiencing some "minor setbacks"
+
 Use [this link](https://gendyp.github.io/smdss_clone/core/index.html) to check out the program.
 
 # About the project
