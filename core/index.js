@@ -12,7 +12,7 @@ var desiredSampleRate = undefined;
 var bufferSize = 1024;
 var numberOfChannels = 2;
 
-var shouldLookUpToUpdate = false;
+var shouldLookUpToUpdate = true;
 var shouldDisableAnalyzer = false;
 
 var engine = null;
@@ -350,7 +350,7 @@ function construct_utilities() {
 
 function animationFrameCode() {
     try {
-        if (!shouldLookUpToUpdate) LIB_QUICK_UI.updateRegisteredComponents();
+        if (shouldLookUpToUpdate) LIB_QUICK_UI.updateRegisteredComponents();
     
         if (!shouldDisableAnalyzer) {
             analyzer.EXECUTE();
@@ -467,7 +467,115 @@ function extendPlayer(playerDomNode) {
     playerDomNode.append(CONTAINER);
 }
 
+class StateObject {
+    #name = "";
+    #functionMap = {};
+
+    constructor(functionMap) {
+        this.functionMap = functionMap;
+    }
+
+    get name() {
+        return this.#name;
+    }
+
+    set name(value) {
+        // Forces a state.
+
+        this.#name = value;
+
+        try {
+            this.#functionMap[this.#name]();
+        }
+        catch {}
+    }
+
+    get functionMap() {
+        return this.#functionMap;
+    }
+
+    set functionMap(value = {}) {
+        // Setting this variable initializes the object.
+
+        Object.assign(this.#functionMap, value);
+
+        this.#name = Object.entries(this.#functionMap)[0][0];
+    }
+
+    execute() {
+        // State function must return the name of the next state.
+
+        const NEW_NAME = this.functionMap[this.#name]();
+
+        if (NEW_NAME in this.#functionMap) {
+            this.#name = NEW_NAME;
+        }
+    }
+}
+
+var theState = new StateObject(
+    {
+        "Disable UI Updates": function () {
+            shouldLookUpToUpdate = false;
+            LIB_QUICK_UI.create_dialog("❌ UI is out of date\n😌 UI components will no longer update their state using property lookups");
+
+            return "Enable UI Updates";
+        },
+        "Enable UI Updates": function () {
+            shouldLookUpToUpdate = true;
+            LIB_QUICK_UI.create_dialog("✔️ UI is up to date and updating\n😣 UI components will now lookup the value from associated object to update their state");
+
+            return "Disable UI Updates";
+        }
+    }
+)
+
+
+
+
+
 function construct_contextMenu() {
+    
+    const OPTION_ARRAY = [
+        theState
+    ];
+
+    const OPTION_NAMES = [];
+
+    function ooba () {
+        OPTION_ARRAY.forEach(function (value, index) {
+            OPTION_NAMES[index] = value.name;
+        });
+
+        return OPTION_NAMES;
+    }
+
+
+    const THE_MAP = {};
+
+    const FLOAT_BLOCK_PIE = new FloatingBlock(
+        piepie( ooba ),
+        true
+    );
+
+    const FLOAT_BLOCK_SIMPLE = new FloatingBlock(
+        LIB_QUICK_UI.create_optionList_executer( () => THE_MAP )
+    );
+
+    // 
+
+
+
+    FLOAT_BLOCK_PIE.domNode.addEventListener("optionlistselect", function (event) {
+        OPTION_ARRAY[event.detail].execute();
+        this.remove();
+    });
+
+    FLOAT_BLOCK_SIMPLE.domNode.addEventListener("optionlistselect", function (event) {
+        console.log(event.detail);
+        this.remove();
+    });
+
     addEventListener("contextmenu", function (event) {
         const BRANCH = document.elementsFromPoint(event.pageX, event.pageY);
 
@@ -478,9 +586,12 @@ function construct_contextMenu() {
             Object.fromEntries( Object.entries(BRANCH) )
         );
 
-        OPTION_LIST.fill();
+        // 
 
-        // console.log(THE_MAP);
+        var chosenFloaty = event.ctrlKey ? FLOAT_BLOCK_PIE : FLOAT_BLOCK_SIMPLE;
+
+        chosenFloaty.domNode.fill();
+        chosenFloaty.show(event);
 
 
 
@@ -511,17 +622,7 @@ function construct_contextMenu() {
 
     // 
 
-    function toggleUiUpdateState() {
-        if (shouldLookUpToUpdate) {
-            shouldLookUpToUpdate = false;
-            LIB_QUICK_UI.create_dialog("✔️ UI is up to date and updating\n😣 UI components will now lookup the value from associated object to update their state");
-        } else {
-            shouldLookUpToUpdate = true;
-            LIB_QUICK_UI.create_dialog("❌ UI is out of date\n😌 UI components will no longer update their state using property lookups");
-        }
-    }
-
-    const THE_MAP = {};
+    
 
     /* {
         "🔎 Magnify block/Cancel": () => magnifier.magnify(),
@@ -535,21 +636,10 @@ function construct_contextMenu() {
         }
     } */
 
-    const OPTION_LIST = piepie( () => Object.keys(THE_MAP) );
-    // LIB_QUICK_UI.create_optionList_executer( () => THE_MAP );
+    
 
-    LIB_QUICK_UI.make_floatingBlock(
-        {
-            blockContent: OPTION_LIST,
-            openName: "contextmenu",
-            shouldCenter: true
-        }
-    );
 
-    OPTION_LIST.addEventListener("optionlistselect", function (event) {
-        console.log(event.detail);
-        this.remove();
-    });
+    
 }
 
 function makeWavFile(samples = [], fileName = "") {
@@ -676,3 +766,20 @@ LIB_QUICK_UI.create_dialog(
     undefined,
     constructor
 );
+
+class ContextHandler {
+    constructor() {
+        Object.defineProperties(
+            this,
+            {
+                "dun": {
+                    value: 0
+                }
+            }
+        );
+    }
+
+    open(domBranch) {
+
+    }
+}

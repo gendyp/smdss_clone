@@ -1,3 +1,11 @@
+function zid_makePlaceholder() {
+    const EMPTY_HOLDER = document.createElement("span");
+    EMPTY_HOLDER.textContent = "Empty";
+    EMPTY_HOLDER.classList.add("qui-text-dim");
+
+    return EMPTY_HOLDER;
+}
+
 const LIB_QUICK_UI = {
     customElements: {
         Input: class extends HTMLInputElement {
@@ -402,9 +410,17 @@ const LIB_QUICK_UI = {
             blockContent.remove();
         };
 
+        addEventListener("visibilitychange", REMOVER);
+
+        // 
+
+        if ( (openName != "") || (openName != null) ) return undefined;
+
         const LISTENER = function (event) {
+            const DOM_NODE = nodeGetter();
+
             event.preventDefault();
-            document.documentElement.append(blockContent);
+            document.documentElement.append(DOM_NODE);
 
             // If event you've decided to use doesn't have pointer position info
             // but you need it, you can provide it by adding properties named
@@ -416,12 +432,12 @@ const LIB_QUICK_UI = {
             var x, y;
             var _shouldCenter = shouldCenter;
             
-            if ("placeMeX" in blockContent) {
-                x = blockContent.placeMeX;
-                y = blockContent.placeMeY;
+            if ("placeMeX" in DOM_NODE) {
+                x = DOM_NODE.placeMeX;
+                y = DOM_NODE.placeMeY;
 
-                delete blockContent.placeMeX;
-                delete blockContent.placeMeY;
+                delete DOM_NODE.placeMeX;
+                delete DOM_NODE.placeMeY;
             }
             else if ( (event instanceof PointerEvent) && (event.button != -1) ) {
                 x = event.pageX;
@@ -439,21 +455,21 @@ const LIB_QUICK_UI = {
             }
 
             if (_shouldCenter) {
-                const RECTANGLE = blockContent.getBoundingClientRect();
+                const RECTANGLE = DOM_NODE.getBoundingClientRect();
 
                 x -= RECTANGLE.width * 0.5;
                 y -= RECTANGLE.height * 0.5;
             }
                 
-            blockContent.style.left = x + "px";
-            blockContent.style.top = y + "px";
+            DOM_NODE.style.left = x + "px";
+            DOM_NODE.style.top = y + "px";
 
             // 
 
             LIB_QUICK_UI.keepCloserToCenter(
                 x,
                 y,
-                blockContent
+                DOM_NODE
             );
 
             // 
@@ -463,17 +479,13 @@ const LIB_QUICK_UI = {
         
         eventTarget.addEventListener(openName, LISTENER);
 
-        addEventListener("visibilitychange", REMOVER);
-
         return LISTENER;
     },
     create_optionList(listGetter = () => []) {
         // When an option selected, it sends a signal with its name.
         // That's all it does.
 
-        const EMPTY_HOLDER = document.createElement("span");
-        EMPTY_HOLDER.textContent = "List is empty";
-        EMPTY_HOLDER.classList.add("qui-text-dim");
+        const EMPTY_HOLDER = zid_makePlaceholder();
 
         // 
 
@@ -622,7 +634,7 @@ const LIB_QUICK_UI = {
         const LISTCONTENT = LIB_QUICK_UI.create_optionList(listGetter);
 
         LISTCONTENT.addEventListener("optionlistselect", function (event) {
-            FIELD.value = event.detail;
+            FIELD.value = event.detail; console.log(LISTCONTENT.options);
             checkSelection();
             this.remove();
         });
@@ -636,31 +648,39 @@ const LIB_QUICK_UI = {
             checkSelection();
         };
 
-        FIELD.addEventListener("focus", function () {
+        FIELD.addEventListener("focus", function (event) {
             // Each time list is focused we should show the whole list as
             // if no options were selected. Make sure list is visible,
             // it might have been hidden last time.
 
             LISTCONTENT.fill();
             LISTCONTENT.style.display = "";
+
+            FLOATY.show(event);
         });
 
         FIELD.addEventListener("pointerdown", function (event) {
-            LISTCONTENT.placeMeX = event.pageX;
-            LISTCONTENT.placeMeY = event.pageY;
+            FLOATY.x = event.pageX;
+            FLOATY.y = event.pageY;
+            // LISTCONTENT.placeMeX = event.pageX;
+            // LISTCONTENT.placeMeY = event.pageY;
         });
 
         FIELD.addEventListener("input", checkSelection);
 
-        this.make_floatingBlock(
+        /* this.make_floatingBlock(
             {
                 blockContent: LISTCONTENT,
                 eventTarget: FIELD,
                 openName: "focus",
                 partsOfSafeArea: [FIELD]
             }
-        );
+        ); */
         
+        // New stuffy.
+        const FLOATY = new FloatingBlock(LISTCONTENT);
+        FLOATY.shouldUseOwnPosition = true;
+
         // 
 
         checkSelection();
@@ -1480,6 +1500,19 @@ const LIB_SVG = {
         }
 
         updateSliceDefinition(angle = 45) {
+            // Simply define a filled circle if angle is
+            // out of bounds. Circle is half of the size.
+
+            if ( (angle <= 0) || (angle >= 360) ) {
+                this.#sliceDefinition = "M -0.5 0 " +
+                "A 0.5 0.5  0 0 1  0.5 0 " +
+                "A 0.5 0.5  0 0 1  -0.5 0";
+
+                return;
+            }
+
+            // 
+
             const TRANSFORM = new DOMMatrix;
 
             // Initial transform points at X. We make it
@@ -1533,21 +1566,41 @@ const LIB_SVG = {
             this.#domNode.append(this.#group);
         }
 
-        fill(listAngles) {
+        fill(rotationArray = []) {
+            // This function assumes you calculated the rotations
+            // somewhere else already, not to do it twice, you provide
+            // it.
+
             this.#group.replaceChildren();
 
-            if ( !Array.isArray(listAngles) ) return;
-            if (listAngles.length == 0) return;
+            if ( !Array.isArray(rotationArray) ) return;
 
             // Create slices using saved path.
 
             const THIS = this;
 
-            this.updateSliceDefinition(360 / listAngles.length);
+            this.updateSliceDefinition(360 / rotationArray.length);
 
             var slice;
 
-            listAngles.forEach(function(angle) {
+            if (rotationArray.length == 0) {
+                slice = LIB_SVG.createElement("path");
+                
+                LIB_SVG.setAttributes(
+                    slice,
+                    {
+                        "d": THIS.#sliceDefinition
+                    }
+                );
+
+                THIS.#group.append(slice);
+
+                return;
+            }
+
+            // 
+
+            rotationArray.forEach(function(angle) {
                 slice = LIB_SVG.createElement("path");
                 
                 LIB_SVG.setAttributes(
@@ -1590,71 +1643,224 @@ function piepie(listGetter = () => []) {
     // 
 
     CONTAINER.fill = function (options) {
-        _options = (options == null) ? listGetter() : options;
-
-        // Get angles for SVG slices and locations for elements,
-        // which going to represent an option.
-
-        const MAGNITUDE = 160;
-        const NUMBER_OF_SLICES = _options.length;
-        const SLICE_ANGLE = 360 / NUMBER_OF_SLICES;
-        const TRANSFORM = new DOMMatrix;
-
-        const LIST_LOCATION = [];
-        const LIST_ANGLE = [];
-
-        var angle = 0;
         var domNode = null;
-
-        // 
+        
+        _options = (options == null) ? listGetter() : options;
 
         LABEL_CONTAINER.replaceChildren();
 
-        for (let i = 0; i < NUMBER_OF_SLICES; i++) {
-            LIST_LOCATION.push(
-                {
-                    x: TRANSFORM.a * MAGNITUDE,
-                    y: TRANSFORM.b * MAGNITUDE
-                }
-            );
-
-            // Create elements here for now.
-
+        if (_options.length == 0) {
             domNode = document.createElement("div");
-            domNode.classList.add("qui-contrast-block-body");
-            domNode.innerText = String( _options[i] );
-
-            domNode.style.top = TRANSFORM.a * -MAGNITUDE + "px";
-            domNode.style.left = TRANSFORM.b * MAGNITUDE + "px";
+            domNode.classList.add("qui-contrast-block-body", "qui-text-dim");
+            domNode.innerText = "Empty";
 
             LABEL_CONTAINER.append(domNode);
 
-            // 
-
-            TRANSFORM.rotateSelf(SLICE_ANGLE);
-
-            // 
-
-            LIST_ANGLE.push(angle);
-
-            angle += SLICE_ANGLE;
+            SVG_PIE.fill();
         }
+        else if (_options.length == 1) {
+            domNode = document.createElement("div");
+            domNode.classList.add("qui-contrast-block-body");
+            domNode.innerText = String( _options[0] );
 
-        SVG_PIE.fill(LIST_ANGLE);
+            LABEL_CONTAINER.append(domNode);
+
+            SVG_PIE.fill();
+        }
+        else {
+            // Get angles for SVG slices and locations for elements,
+            // which going to represent an option.
+
+            const MAGNITUDE = 160;
+            const NUMBER_OF_SLICES = _options.length;
+            const SLICE_ANGLE = 360 / NUMBER_OF_SLICES;
+            const TRANSFORM = new DOMMatrix;
+
+            const LIST_LOCATION = [];
+            const LIST_ANGLE = [];
+
+            var angle = 0;
+
+            // 
+
+            for (let i = 0; i < NUMBER_OF_SLICES; i++) {
+                LIST_LOCATION.push(
+                    {
+                        x: TRANSFORM.a * MAGNITUDE,
+                        y: TRANSFORM.b * MAGNITUDE
+                    }
+                );
+
+                // Create elements here for now.
+
+                domNode = document.createElement("div");
+                domNode.classList.add("qui-contrast-block-body");
+                domNode.innerText = String( _options[i] );
+
+                domNode.style.top = TRANSFORM.a * -MAGNITUDE + "px";
+                domNode.style.left = TRANSFORM.b * MAGNITUDE + "px";
+
+                LABEL_CONTAINER.append(domNode);
+
+                // 
+
+                TRANSFORM.rotateSelf(SLICE_ANGLE);
+
+                // 
+
+                LIST_ANGLE.push(angle);
+
+                angle += SLICE_ANGLE;
+            }
+
+            SVG_PIE.fill(LIST_ANGLE);
+        }
     }
 
     SVG_PIE.domNode.addEventListener("pointerdown", function (event) {
         if (event.target == this) return;
 
-        // 
+        // #NOTE
+        // This piepie stuff sends index, and the other sends name.
+        // Make it consistent. :S
 
         var index = Array.prototype.indexOf.call(event.target.parentElement.children, event.target);
 
         CONTAINER.dispatchEvent(new CustomEvent("optionlistselect", {
             bubbles: true,
-            detail: _options[index]
+            detail: index
         }));
     });
 
     return CONTAINER;
+}
+
+
+
+
+// #NOTE
+// Let it be so - domNode is a internal representation of a node inside a DOM,
+// whereas block will be visual representation of a node. So, to describe a
+// DOM node in full we would say "here we have a domNode (in code) represented by
+// this block (on screen)". In terms of HTML we would call it an element, but we
+// don't speak HTML here. In code, block and domNode would refer to the same thing.
+// We use whichever works best to describe its function.
+
+class FloatingBlock {
+    #nodeRemover;
+
+    constructor(domNode, shouldNodeBeCentered = false) {
+        Object.defineProperties(
+            this,
+            {
+                "domNode": {
+                    value: domNode,
+                    writable: true
+                },
+                "x": {
+                    value: 0,
+                    writable: true
+                },
+                "y": {
+                    value: 0,
+                    writable: true
+                },
+                "shouldUseOwnPosition": {
+                    value: false,
+                    writable: true
+                },
+                "shouldNodeBeCentered": {
+                    value: shouldNodeBeCentered,
+                    writable: true
+                },
+                "hitTestIncludeList": {
+                    value: []
+                }
+            }
+        );
+
+        this.hitTestIncludeList.push(this.domNode);
+
+        this.#nodeRemover = (
+            function (event) {
+                const LENGTH = this.hitTestIncludeList.length;
+
+                var target = null;
+
+                for (let i = 0; i < LENGTH; i++) {
+                    target = this.hitTestIncludeList[i];
+
+                    if ( (event.target == target) || (target.contains(event.target)) ) return false;
+                }
+
+                // Node is being removed from DOM tree.
+
+                this.domNode.remove();
+
+                return true;
+            }
+        ).bind(this);
+
+        addEventListener("visibilitychange", this.#nodeRemover);
+
+        // 
+
+        this.domNode.classList.add("qui-floating-block");
+    }
+
+    show(pointerEvent) {
+        var _shouldNodeBeCentered = this.shouldNodeBeCentered;
+
+        document.documentElement.append(this.domNode);
+
+        // 
+
+        if (this.shouldUseOwnPosition) ;
+        else if ( (pointerEvent instanceof PointerEvent) && (pointerEvent.button != -1) ) {
+            pointerEvent.preventDefault();
+
+            this.x = pointerEvent.pageX;
+            this.y = pointerEvent.pageY;
+        }
+        else {
+            // No position data was found. Place the block in center.
+
+            const RECTANGLE = document.documentElement.getBoundingClientRect();
+
+            this.x = RECTANGLE.width * 0.5;
+            this.y = RECTANGLE.height * 0.5;
+
+            _shouldNodeBeCentered = true;
+        }
+
+        // 
+
+        if (_shouldNodeBeCentered) {
+            const RECTANGLE = this.domNode.getBoundingClientRect();
+
+            this.x -= RECTANGLE.width * 0.5;
+            this.y -= RECTANGLE.height * 0.5;
+        }
+
+        // 
+
+        this.domNode.style.left = this.x + "px";
+        this.domNode.style.top = this.y + "px";
+
+        LIB_QUICK_UI.keepCloserToCenter(
+            this.x,
+            this.y,
+            this.domNode
+        );
+
+        // 
+
+        const SELF_REMOVER = (
+            function (event) {
+                if ( this.#nodeRemover(event) ) removeEventListener(event.type, SELF_REMOVER);
+            }
+        ).bind(this);
+
+        addEventListener("pointerdown", SELF_REMOVER);
+    };
 }

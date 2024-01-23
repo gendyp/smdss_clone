@@ -266,7 +266,8 @@
 /* SVG pie style */
 
 .qui-pie-svg {
-    background-image: radial-gradient(white 6%, #46e5ff 10%, #0089ff 18%, transparent 70%);
+    background-image: radial-gradient(white 7%, #ff8d00 9%, #fc5100cc 26%, transparent 70%);
+    mix-blend-mode: screen /* plus-lighter */ /* make it work? */;
 }
 
 .qui-pie-svg path {
